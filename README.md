@@ -19,7 +19,7 @@ git clone https://github.com/paolaozv/habits_tracking_app.git
 cd habits-tracking-app
 ```
 
-2. Create and activate a virtual environment (recommended):
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -88,28 +88,6 @@ Find longest streak:
 python -m src.cli analytics longest-streak
 ```
 
-## Project Structure
-
-```
-habit-tracker/
-├── src/
-│   ├── __init__.py
-│   ├── habit.py          # Core Habit class
-│   ├── db_manager.py     # Database operations
-│   ├── analytics.py      # Analytics functionality
-│   ├── cli.py           # Command-line interface
-│   └── example_data.py   # Example data generator
-├── tests/
-│   ├── __init__.py
-│   ├── test_habit.py
-│   ├── test_db_manager.py
-│   ├── test_analytics.py
-│   ├── test_cli.py
-│   └── test_example_data.py
-├── README.md
-└── requirements.txt
-```
-
 ## Testing
 
 Run the test suite:
@@ -118,14 +96,6 @@ pytest
 ```
 
 ## Development
-
-### Code Style
-
-This project follows PEP 8 guidelines:
-- Use 2 spaces for indentation
-- Maximum line length of 100 characters
-- Clear, descriptive variable names
-- Comprehensive docstrings for classes and functions
 
 ### Key Components
 
@@ -156,9 +126,3 @@ The project includes example data with:
 - 2 weekly habits (Planning, Meal Prep)
 - 4 weeks of realistic check-off history
 - Various completion rates (60% - 100%)
-
-## Acknowledgments
-
-- Built with Python 3.8+
-- Uses Click for CLI
-- SQLite for data storage
