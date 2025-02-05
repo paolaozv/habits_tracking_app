@@ -94,35 +94,3 @@ Run the test suite:
 ```bash
 pytest
 ```
-
-## Development
-
-### Key Components
-
-1. **Habit Class** (`src/habit.py`)
-   - Core habit tracking functionality
-   - Streak calculation
-   - Completion rate tracking
-
-2. **Database Manager** (`src/db_manager.py`)
-   - SQLite database operations
-   - Data persistence
-   - CRUD operations for habits
-
-3. **Analytics** (`src/analytics.py`)
-   - Statistical analysis
-   - Performance metrics
-   - Habit filtering
-
-4. **CLI Interface** (`src/cli.py`)
-   - Command-line interface
-   - User interaction
-   - Data visualization
-
-### Example Data
-
-The project includes example data with:
-- 3 daily habits (Exercise, Reading, Meditation)
-- 2 weekly habits (Planning, Meal Prep)
-- 4 weeks of realistic check-off history
-- Various completion rates (60% - 100%)
