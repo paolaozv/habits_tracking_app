@@ -29,43 +29,39 @@ class Habit:
       self.check_off_dates.sort()
 
   def calculate_streak(self) -> int:
-    """Calculate the current streak of habit completion."""
+    """Calculate the current streak."""
     if not self.check_off_dates:
-      return 0
+        return 0
 
     today = datetime.now()
-    current_streak = 0
+    sorted_dates = sorted(self.check_off_dates, reverse=True)
     
-    # Start checking from the most recent check-off
-    check_dates = sorted(self.check_off_dates, reverse=True)
-    last_date = check_dates[0]
-
-    # Define the expected interval based on periodicity
+    # Check if the most recent check-off is within the expected interval
     if self.periodicity == 'daily':
-      expected_interval = timedelta(days=1)
+        if today - sorted_dates[0] > timedelta(days=1):
+            return 0
     elif self.periodicity == 'weekly':
-      expected_interval = timedelta(days=7)
+        if today - sorted_dates[0] > timedelta(days=7):
+            return 0
     else:  # monthly
-      expected_interval = timedelta(days=30)  # Simplified monthly calculation
+        if today - sorted_dates[0] > timedelta(days=30):
+            return 0
 
-    # Calculate streak
-    for i in range(len(check_dates) - 1):
-      current_date = check_dates[i]
-      next_date = check_dates[i + 1]
-        
-      # Check if dates are within expected interval
-      if (current_date - next_date) <= expected_interval:
-        current_streak += 1
-      else:
-        break
+    streak = 1
+    expected_interval = {
+        'daily': timedelta(days=1),
+        'weekly': timedelta(days=7),
+        'monthly': timedelta(days=30)
+    }[self.periodicity]
 
-    # Check if the streak is still active
-    if (today - last_date) <= expected_interval:
-      current_streak += 1
-    else:
-      current_streak = 0
+    # Count consecutive check-offs
+    for i in range(len(sorted_dates) - 1):
+        if sorted_dates[i] - sorted_dates[i + 1] <= expected_interval:
+            streak += 1
+        else:
+            break
 
-    return current_streak
+    return streak
 
   def get_completion_rate(self) -> float:
     """Calculate the completion rate as a percentage."""

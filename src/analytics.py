@@ -84,19 +84,36 @@ class HabitAnalytics:
     Calculate completion rates by periodicity.
     
     Returns:
-      Dictionary with completion rates for each periodicity
+        Dictionary with completion rates for each periodicity
     """
+    # Initialize summary with 0.0 for all periodicities
+    summary = {'daily': 0.0, 'weekly': 0.0, 'monthly': 0.0}
     habits = self.db.get_all_habits()
-    summary = {'daily': [], 'weekly': [], 'monthly': []}
+    today = datetime.now()
     
-    for _, habit in habits:
-      summary[habit.periodicity].append(habit.get_completion_rate())
+    for habit_id, habit in habits:
+        check_offs = self.db.get_check_offs(habit_id)
+        
+        if habit.periodicity == "daily":
+            # Calculate percentage for daily habits (last 10 days)
+            total_days = 10
+            recent_check_offs = [co for co in check_offs if (today - co) <= timedelta(days=total_days)]
+            completion_percentage = round((len(recent_check_offs) / total_days) * 100)
+            summary['daily'] = completion_percentage
+        elif habit.periodicity == "weekly":
+            # Calculate percentage for weekly habits (last 4 weeks)
+            total_weeks = 4
+            recent_check_offs = [co for co in check_offs if (today - co) <= timedelta(weeks=total_weeks)]
+            completion_percentage = (len(recent_check_offs) / total_weeks) * 100
+            summary['weekly'] = completion_percentage
+        elif habit.periodicity == "monthly":
+            # Calculate percentage for monthly habits (last 3 months)
+            total_months = 3
+            recent_check_offs = [co for co in check_offs if (today - co) <= timedelta(days=total_months * 30)]
+            completion_percentage = (len(recent_check_offs) / total_months) * 100
+            summary['monthly'] = completion_percentage
     
-    # Calculate averages
-    return {
-      periodicity: sum(rates) / len(rates) if rates else 0.0
-      for periodicity, rates in summary.items()
-    }
+    return summary
 
   def get_current_streaks(self) -> List[Tuple[int, Habit, int]]:
     """

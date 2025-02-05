@@ -166,6 +166,36 @@ def longest_streak():
   click.echo(f"Habit: {habit.task_name}")
   click.echo(f"Streak: {streak} days")
 
+@cli.command()
+@click.option('--force', '-f', is_flag=True, help='Skip confirmation if database exists')
+def load_examples(force: bool):
+  """Load example habits with 4 weeks of history."""
+  if not force and db.get_all_habits():
+    if not click.confirm("This will clear existing habits. Continue?"):
+      click.echo("Operation cancelled")
+      return
+  
+  try:
+    # Clear existing data
+    habits = db.get_all_habits()
+    for habit_id, _ in habits:
+      db.delete_habit(habit_id)
+        
+    # Create example data
+    from .example_data import create_example_data
+    habits = create_example_data(db)
+    
+    click.echo("\nCreated example habits:")
+    click.echo("-" * 50)
+    for habit_id, habit in habits:
+      click.echo(f"ID {habit_id}: {habit.task_name} ({habit.periodicity})")
+      click.echo(f"  Current streak: {habit.calculate_streak()}")
+      click.echo(f"  Completion rate: {habit.get_completion_rate():.1f}%")
+      click.echo()
+          
+  except Exception as e:
+    click.echo(f"Error creating example data: {e}", err=True)
+
 def main():
   try:
     cli()

@@ -45,27 +45,24 @@ class HabitDatabase:
   def load_habit(self, habit_id: int) -> Optional[Habit]:
     """Load a habit and its check-offs from the database."""
     cursor = self.conn.execute("""
-      SELECT * FROM habits WHERE id = ?
+        SELECT * FROM habits WHERE id = ?
     """, (habit_id,))
     habit_data = cursor.fetchone()
     
     if not habit_data:
-      return None
+        return None
 
     # Create habit instance
     habit = Habit(
-      task_name=habit_data['task_name'],
-      periodicity=habit_data['periodicity'],
-      creation_date=datetime.fromisoformat(habit_data['creation_date'])
+        task_name=habit_data['task_name'],
+        periodicity=habit_data['periodicity'],
+        creation_date=datetime.fromisoformat(habit_data['creation_date'])
     )
 
     # Load check-offs
-    cursor = self.conn.execute("""
-      SELECT check_date FROM check_offs WHERE habit_id = ?
-    """, (habit_id,))
-      
-    for row in cursor.fetchall():
-      habit.check_off_dates.append(datetime.fromisoformat(row['check_date']))
+    check_offs = self.get_check_offs(habit_id)
+    for check_date in check_offs:
+        habit.check_off(check_date)
 
     return habit
 
@@ -79,11 +76,21 @@ class HabitDatabase:
 
   def get_all_habits(self) -> List[tuple[int, Habit]]:
     """Return all habits with their IDs."""
-    cursor = self.conn.execute("SELECT id FROM habits")
+    cursor = self.conn.execute("SELECT * FROM habits")
     habits = []
     for row in cursor.fetchall():
-      habit = self.load_habit(row['id'])
-      if habit:
+        # Create habit instance
+        habit = Habit(
+            task_name=row['task_name'],
+            periodicity=row['periodicity'],
+            creation_date=datetime.fromisoformat(row['creation_date'])
+        )
+        
+        # Load check-offs for this habit
+        check_offs = self.get_check_offs(row['id'])
+        for check_date in check_offs:
+            habit.check_off(check_date)
+        
         habits.append((row['id'], habit))
     return habits
 
@@ -92,6 +99,16 @@ class HabitDatabase:
     with self.conn:
       self.conn.execute("DELETE FROM check_offs WHERE habit_id = ?", (habit_id,))
       self.conn.execute("DELETE FROM habits WHERE id = ?", (habit_id,))
+
+  def get_check_offs(self, habit_id: int) -> List[datetime]:
+    """Get all check-off dates for a habit."""
+    cursor = self.conn.execute("""
+        SELECT check_date FROM check_offs 
+        WHERE habit_id = ?
+        ORDER BY check_date
+    """, (habit_id,))
+    
+    return [datetime.fromisoformat(row['check_date']) for row in cursor.fetchall()]
 
   def close(self) -> None:
     """Close the database connection."""
