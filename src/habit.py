@@ -31,35 +31,35 @@ class Habit:
   def calculate_streak(self) -> int:
     """Calculate the current streak."""
     if not self.check_off_dates:
-        return 0
+      return 0
 
     today = datetime.now()
     sorted_dates = sorted(self.check_off_dates, reverse=True)
     
     # Check if the most recent check-off is within the expected interval
     if self.periodicity == 'daily':
-        if today - sorted_dates[0] > timedelta(days=1):
-            return 0
+      if today - sorted_dates[0] > timedelta(days=1):
+        return 0
     elif self.periodicity == 'weekly':
-        if today - sorted_dates[0] > timedelta(days=7):
-            return 0
+      if today - sorted_dates[0] > timedelta(days=7):
+        return 0
     else:  # monthly
-        if today - sorted_dates[0] > timedelta(days=30):
-            return 0
+      if today - sorted_dates[0] > timedelta(days=30):
+        return 0
 
     streak = 1
     expected_interval = {
-        'daily': timedelta(days=1),
-        'weekly': timedelta(days=7),
-        'monthly': timedelta(days=30)
+      'daily': timedelta(days=1),
+      'weekly': timedelta(days=7),
+      'monthly': timedelta(days=30)
     }[self.periodicity]
 
     # Count consecutive check-offs
     for i in range(len(sorted_dates) - 1):
-        if sorted_dates[i] - sorted_dates[i + 1] <= expected_interval:
-            streak += 1
-        else:
-            break
+      if sorted_dates[i] - sorted_dates[i + 1] <= expected_interval:
+        streak += 1
+      else:
+        break
 
     return streak
 

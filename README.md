@@ -21,7 +21,7 @@ cd habits-tracking-app
 
 2. Create and activate a virtual environment:
 ```bash
-python -m venv venv
+python -m venv venv # or python3 -m venv venv according to python version
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
